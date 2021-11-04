@@ -1,0 +1,3 @@
+/Users/jacobscottmckenzie/Project4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/jacobscottmckenzie/Project4/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/jacobscottmckenzie/Project4/cmake-build-debug/CMakeFiles/Project1_Starter_Code.dir

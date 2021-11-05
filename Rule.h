@@ -5,9 +5,11 @@
 #include "Predicate.h"
 class Rule{
 private:
+
+public:
     Predicate* headPredicate;
     std::vector<Predicate*> bodyPredicates;
-public:
+
     Rule(Predicate* head) {this->headPredicate = head;};
 
     void addHeadParam(Parameter* param) {this->headPredicate->AddAParameter(param);};

@@ -20,6 +20,7 @@ public:
         this->dataLog = DataLog;
         this->setSchemes();
         this->setFacts();
+        this->setRules();
         this->output = this->setQueries();
 
     };
@@ -38,6 +39,49 @@ public:
             this->dataBase.theMap[p->getID()]->addTuple(t);
         }
     };
+    void setRules() {
+        bool tupleAdded = true;
+       // int loopedTimes = 0;
+        while(tupleAdded) {
+           // loopedTimes += 1;
+            tupleAdded = false;
+            for(Rule * R : this->dataLog.rules){
+                if(R->bodyPredicates.size() == 1) {
+                    //no joins are necessary
+
+                }
+                else {
+                    std::vector<Relation*> toJoin;
+                    size_t oldSize = this->dataBase.theMap[R->headPredicate->getID()]->rowSize();
+                    for(Predicate * p : R->bodyPredicates) {
+
+                        Relation* copyRel = new Relation(this->dataBase.theMap[p->getID()]->getName(), this->dataBase.theMap[p->getID()]->getHeader().attributes);
+                        copyRel = evaluatePredicate(p->getParameters(), copyRel);
+                        toJoin.push_back(copyRel);
+                    }
+                    for(size_t i = 0; i<toJoin.size()-1; i++) {
+                        toJoin.at(i+1) = toJoin.at(i)->NatJoin(*(toJoin.at(i+1)));
+                    }
+                    std::vector<size_t> commonIndexs = toJoin.back()->CommonIndex(toJoin.back()->getHeader(),this->dataBase.theMap[R->headPredicate->getID()]->getHeader());
+                    toJoin.back()->Project(commonIndexs);
+                    //this->dataBase.theMap[R->headPredicate->getID()]->Unionize(*toJoin.back());
+                    for(const Tuple& tup : toJoin.back()->getRows()) {
+                        //if() {}
+                        this->dataBase.theMap[R->headPredicate->getID()]->addTuple(const_cast<Tuple &>(tup));
+                    }
+                    if(this->dataBase.theMap[R->headPredicate->getID()]->rowSize() > oldSize) {
+                        tupleAdded = true;
+                    }
+                }
+
+            }
+
+        }
+
+    };
+//    std::vector<Relation> RightHandRelations() {
+//        //create using evaluatePredicate function
+//    }
     std::string setQueries() {
         std::string theOut = "";
         for (Predicate* p : this->dataLog.queries) {
@@ -70,9 +114,9 @@ public:
 
         }
 
-        theOut += "\n\n\n\n";
-        this->dataBase.theMap["marriedTo"] = this->dataBase.theMap["marriedTo"]->NatJoin(*(this->dataBase.theMap["childOf"]));
-        theOut += this->dataBase.theMap["marriedTo"]->toString() + "\n";
+        //theOut += "\n\n\n\n";
+        //this->dataBase.theMap["marriedTo"] = this->dataBase.theMap["marriedTo"]->NatJoin(*(this->dataBase.theMap["childOf"]));
+        //theOut += this->dataBase.theMap["marriedTo"]->toString() + "\n";
         return theOut.substr(0,theOut.size()-1);
     };
 

@@ -23,9 +23,11 @@ public:
         for(Parameter* p : scheme->getParameterVector()) {
             a.push_back(p->toString());
         }
-
-        this->theMap[scheme->getID()] = new Relation(scheme->getID(),a);
-        this->relations.push_back(new Relation(scheme->getID(),a));
+        Relation * r = new Relation(scheme->getID(),a);
+        this->theMap[scheme->getID()] = r;
+        this->relations.push_back(r);
+//        this->theMap[scheme->getID()] = new Relation(scheme->getID(),a);
+//        this->relations.push_back(new Relation(scheme->getID(),a));
     };
    void addTuple(std::vector<Predicate*> facts);
    std::string toString(){

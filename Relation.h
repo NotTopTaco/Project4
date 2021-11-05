@@ -21,6 +21,7 @@ public:
     std::string getName(){return this->name;};
     Header getHeader(){return *this->header;};
     std::set<Tuple> getRows(){return this->rows;};
+    size_t rowSize(){return this->rows.size();};
     Relation(std::string nombre, std::vector<std::string> heder) {
         this->name = nombre;
         this->header = new Header(heder);
@@ -52,7 +53,7 @@ public:
         this->rows = tups;
     };
     void addHeader(Header* h){this->header = h;};
-    void addTuple(Tuple t) {this->rows.insert(t);};
+    const void addTuple(Tuple& t) {this->rows.insert(t);};
     std::string toString() {
         std::string temp = "";
         for(size_t i = 0; i< this->header->attributes.size(); i++) {
@@ -118,6 +119,23 @@ public:
         for(Tuple T : this->rows) {
             std::vector<std::string> valToAdd;
             for(int idx : indxs) {
+                valToAdd.push_back(T.getAVal(idx));
+            }
+            if(valToAdd.size() != 0) {
+                Tuple curT(valToAdd);
+                upTups.insert(curT);
+            }
+        }
+        //TODO do I need to update the header?
+        return *(new Relation(this->name, this->header->attributes, upTups));
+    };
+    Relation Project(std::vector<size_t> indxs) {
+        std::set<Tuple> upTups;
+        std::vector<std::string> valToKeep;
+
+        for(Tuple T : this->rows) {
+            std::vector<std::string> valToAdd;
+            for(size_t idx : indxs) {
                 valToAdd.push_back(T.getAVal(idx));
             }
             if(valToAdd.size() != 0) {

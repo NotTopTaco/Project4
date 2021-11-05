@@ -1,7 +1,7 @@
 # COPYRIGHT © BRIGHAM YOUNG UNIVERSITY CS 236
 # FOR USE ONLY DURING SUMMER 2021 SEMESTER
 Schemes:
-   childOf(A,B)
+   childOf(B,C)
    marriedTo(A,B)
    siblings(W,X,Y,Z)
 

@@ -16,9 +16,9 @@ public:
     bool operator< (const Tuple &rhs) const {
         return values < rhs.values;
     }
-    size_t getSize() {return this->values.size();};
-    std::string getAVal(int i){return this->values.at(i);};
-    std::string getAVal(size_t index){return this->values.at(index);};
+    size_t getSize() const {return this->values.size();};
+    std::string getAVal(int i) const {return this->values.at(i);};
+    std::string getAVal(size_t index) const {return this->values.at(index);};
     void addVal(std::string toAdd){this->values.push_back(toAdd);};
     Tuple() {};
     Tuple(std::vector<std::string> vals) {this->values = vals;};

@@ -63,7 +63,20 @@ public:
                    *copyRel = copyRel->Project(commonindecies);
                     for(const Tuple& tup : copyRel->getRows()) {
                         //if() {}
+                        size_t sizebeforeAdd = this->dataBase.theMap[R->headPredicate->getID()]->rowSize();
                         this->dataBase.theMap[R->headPredicate->getID()]->addTuple(const_cast<Tuple &>(tup));
+                        if(this->dataBase.theMap[R->headPredicate->getID()]->rowSize() > sizebeforeAdd) {
+                            toReturn += "  ";
+                            for (size_t i = 0; i < tup.getSize(); i++) {
+
+                                if (i == tup.getSize() - 1) {
+                                    toReturn += this->dataBase.theMap[R->headPredicate->getID()]->getHeader().attributes.at(i) + "=" + tup.getAVal(i);
+                                } else {
+                                    toReturn += this->dataBase.theMap[R->headPredicate->getID()]->getHeader().attributes.at(i) + "=" + tup.getAVal(i) + ", ";
+                                }
+                            }
+                            toReturn += "\n";
+                        }
                     }
 
                 }

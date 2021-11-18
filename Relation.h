@@ -8,6 +8,7 @@
 #include <string>
 #include <set>
 #include "Header.h"
+#include <map>
 
 #include "Tuple.h"
 class Relation {
@@ -157,10 +158,76 @@ public:
         }
         return *(new Relation(this->name, this->header, tupless));
     }
+    Relation* NatJoin2(Relation rJoin) {
+        //std::vector<size_t> t1 = CommonIndexx(this->header->attributes,rJoin.getHeader().attributes);
+        //std::vector<size_t> t2 = CommonIndexx(rJoin.getHeader().attributes, this->header->attributes);
+        std::map<size_t,size_t> t1 = CommonIdx(this->header->attributes,rJoin.getHeader().attributes);
+        //TODO use the map to see if they are the same
+        std::set<Tuple> newRows;
+
+        for(Tuple tup1 : this->rows) {
+            for(Tuple tup2: rJoin.getRows()) {
+                bool jable = true;
+                if (t1.size() != 0) {
+                    for(std::pair<size_t , size_t> element : t1) {
+                        if(tup1.getAVal(element.first) != tup2.getAVal(element.second)){
+                            jable = false;
+                        }
+                    }
+
+
+//                    for(size_t i=0; i<t1.size();i++) {
+//                        if(tup1.getAVal(i) != tup2.getAVal(t1.at(i))){
+//                            jable = false;
+//                        }
+//                    }
+                }
+                if(jable) {
+                    std::vector<std::string> newTup;
+                    if(t1.size() == 0) {
+                        for(size_t i = 0; i < tup1.getSize(); i++) {
+                            newTup.push_back(tup1.getAVal(i));
+                        }
+                        for(size_t i = 0; i < tup2.getSize(); i++) {
+                            newTup.push_back(tup2.getAVal(i));
+                        }
+                    }
+                    else {
+                        for(size_t i = 0; i < tup1.getSize(); i++) {
+                            newTup.push_back(tup1.getAVal(i));
+                        }
+                        for(size_t j = 0; j < tup2.getSize(); j++) {
+                            bool isCommon = false;
+
+                            /*for(size_t z : t1) {
+                                if(j == z) {
+                                    isCommon = true;
+                                }
+                            }*/
+                            for (std::pair<size_t , size_t> element : t1) {
+                                if(element.second == j){
+                                    isCommon = true;
+                                }
+                            }
+                            if(!isCommon) {
+                                newTup.push_back(tup2.getAVal(j));
+                            }
+                        }
+                    }
+
+                    Tuple a(newTup);
+                    newRows.insert(a);
+                }
+            }
+            }
+        return new Relation(CombineHeaders(*(this->header),rJoin.getHeader()),newRows);
+    }
     Relation* NatJoin(Relation rJoin) {
         //TODO get the indecies in common, then go through all rows and see if you can join em, if you can, do it
         std::vector<size_t> t1 = CommonIndex(*(this->header),rJoin.getHeader());
         std::vector<size_t> t2 = CommonIndex(rJoin.getHeader(),*(this->header));
+        //std::vector<size_t> t11 = CommonIndexx(this->header->attributes,rJoin.getHeader().attributes);
+        //std::vector<size_t> t22 = CommonIndexx(rJoin.getHeader().attributes,this->header->attributes);
         std::set<Tuple> newRows;
         for(Tuple tup1 : this->rows) {
             for(Tuple tup2: rJoin.getRows()) {
@@ -204,10 +271,12 @@ public:
         return new Relation(CombineHeaders(*(this->header),rJoin.getHeader()),newRows);
     }
     std::vector<size_t> CommonIndex(Header aH, Header bH) {
+        //std::vector<size_t> indecies = CommonIndexx(aH.attributes,bH.attributes);
         std::vector<size_t> indecies;
         for(size_t i = 0; i<aH.attributes.size(); i++) {
             for(size_t j = 0; j<bH.attributes.size(); j++) {
                 if(bH.attributes.at(j) == aH.attributes.at(i)) {
+                    //TODO make it j
                     indecies.push_back(i);
                 }
             }
@@ -216,6 +285,14 @@ public:
     }
     bool isJoinable(Tuple a, Tuple b, std::vector<size_t> aIdx, std::vector<size_t> bIdx) {
         //bool resultado = false;
+        /*if(aIdx2 == bIdx2) {
+            for(size_t i = 0; i < aIdx2.size(); i++) {
+                if(a.getAVal(aIdx2.at(i)) != b.getAVal(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }*/
         if(aIdx.empty() && bIdx.empty()) {
             return true;
         }
@@ -225,14 +302,44 @@ public:
             }
             else {
                 for(size_t i = 0; i < aIdx.size(); i++) {
-                        if(a.getAVal(aIdx.at(i)) != b.getAVal(bIdx.at(i))) {
+                    if(a.getAVal(aIdx.at(i)) != b.getAVal(bIdx.at(i))) {
+                        //if(a.getAVal(aIdx.at(i)) != b.getAVal(i)) {
                             return false;
                         }
                 }
+
             }
         }
         return true;
     }
+    std::vector<size_t> CommonIndexx(std::vector<std::string> aH, std::vector<std::string> bH) {
+        std::vector<size_t> indecies;
+
+        for (size_t i = 0; i < aH.size(); i++) {
+            for (size_t j = 0; j < bH.size(); j++) {
+                if (aH.at(i) == bH.at(j)) {
+                    indecies.push_back(j);
+                }
+
+            }
+
+        }
+        return indecies;
+    }
+    std::map<size_t,size_t> CommonIdx(std::vector<std::string> aH, std::vector<std::string> bH) {
+        std::map<size_t,size_t> indecies;
+        for (size_t i = 0; i < aH.size(); i++) {
+            for (size_t j = 0; j < bH.size(); j++) {
+                if (aH.at(i) == bH.at(j)) {
+                    indecies.insert({i,j});
+                }
+
+            }
+
+        }
+        return indecies;
+    };
+
     std::vector<std::string> CombineHeaders(Header a, Header b) {
         std::vector<std::string> newAttrs;
         for(size_t i = 0; i< a.attributes.size(); i++) {

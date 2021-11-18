@@ -95,7 +95,7 @@ public:
                         indexer += 1;
                     }
                     for(size_t i = 0; i<toJoin.size()-1; i++) {
-                        toJoin.at(i+1) = toJoin.at(i)->NatJoin(*(toJoin.at(i+1)));
+                        toJoin.at(i+1) = toJoin.at(i)->NatJoin2(*(toJoin.at(i+1)));
                     }
                     //std::vector<size_t> commonIndexs = toJoin.back()->CommonIndex(toJoin.back()->getHeader(),this->dataBase.theMap[R->headPredicate->getID()]->getHeader());
                     std::vector<size_t> commonIndexs = CommonIndex(R->headPredicate->getParameters(), toJoin.back()->getHeader().attributes);

@@ -66,6 +66,7 @@ public:
                         size_t sizebeforeAdd = this->dataBase.theMap[R->headPredicate->getID()]->rowSize();
                         this->dataBase.theMap[R->headPredicate->getID()]->addTuple(const_cast<Tuple &>(tup));
                         if(this->dataBase.theMap[R->headPredicate->getID()]->rowSize() > sizebeforeAdd) {
+                            tupleAdded = true;
                             toReturn += "  ";
                             for (size_t i = 0; i < tup.getSize(); i++) {
 
@@ -132,7 +133,7 @@ public:
 //        //create using evaluatePredicate function
 //    }
     std::string setQueries() {
-        std::string theOut = "Query Evaluation";
+        std::string theOut = "Query Evaluation\n";
         for (Predicate* p : this->dataLog.queries) {
            Relation* copyRel = new Relation(this->dataBase.theMap[p->getID()]->getName(), this->dataBase.theMap[p->getID()]->getHeader().attributes);
            for(Tuple T : this->dataBase.theMap[p->getID()]->getRows()) {
